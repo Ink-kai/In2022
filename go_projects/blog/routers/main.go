@@ -6,6 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	response = make(map[string]interface{})
+)
+
 func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -23,20 +27,21 @@ func InitRouter() *gin.Engine {
 		// 获取
 		api.GET("/article")
 		api.GET("/tags")
-		api.GET("/user")
+		api.GET("/user/:uid", GetUser)
+		api.GET("/users", GetAllUser)
 		api.GET("/comment")
 
 		// 修改
 		api.PUT("/article:aid")
-		api.PUT("/tags:aid")
-		api.PUT("/user:aid")
-		api.PUT("/comment:aid")
+		api.PUT("/tags:tid")
+		api.PUT("/user/:uid", UpdateUser)
+		api.PUT("/comment:cid")
 
 		// 删除
 		api.DELETE("/article:aid")
-		api.DELETE("/tags:aid")
-		api.DELETE("/user:aid")
-		api.DELETE("/comment:aid")
+		api.DELETE("/tags:tid")
+		api.DELETE("/user/:uid", DelUser)
+		api.DELETE("/comment:cid")
 	}
 	return r
 }

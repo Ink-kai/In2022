@@ -24,7 +24,7 @@ func main() {
 	}
 	go func() {
 		if err := h.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen:%s\n", err)
+			log.Printf("listen:%s\n", err)
 		}
 	}()
 

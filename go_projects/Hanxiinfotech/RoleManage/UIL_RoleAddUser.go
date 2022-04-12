@@ -61,7 +61,7 @@ func Read_excel(path, role_name, rolecode_name string, roleNameNum, roleCodeNum,
 	return user_data
 }
 
-func Request_url(r Req_meta) {
+func Request_url(r req_meta) {
 	log.SetFlags(log.Lmicroseconds | log.Ldate)
 	client := &http.Client{}
 	req, err := http.NewRequest(r.Method, r.Url, r.Url_form)

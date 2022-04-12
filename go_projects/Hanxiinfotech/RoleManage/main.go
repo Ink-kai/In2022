@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/url"
-	. "package/common"
+	. "pro22/common"
 	"strconv"
 	"strings"
 )
