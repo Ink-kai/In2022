@@ -18,10 +18,12 @@ if [ -a "/etc/named.conf" ];then
         sudo sed -e '$a include "/etc/named/confs/named.inkCloud.zones";' -i.bak /etc/named.conf
     fi
     sudo mkdir -p /etc/named/confs;
-    echo "firewall开放named服务"
-    sudo firewall-cmd --permanent --zone=public --add-port=53/tcp
-    sudo firewall-cmd --permanent --zone=public --add-port=53/udp
-    sudo firewall-cmd --reload
+    if [ ! "$(sudo firewall-cmd --list-ports|grep 53)" ];then        
+        echo "firewall开放named服务"
+        sudo firewall-cmd --permanent --zone=public --add-port=53/tcp
+        sudo firewall-cmd --permanent --zone=public --add-port=53/udp
+        sudo firewall-cmd --reload
+    fi
     echo "开机启动DNS服务"
     sudo systemctl enable named
     sudo systemctl start named

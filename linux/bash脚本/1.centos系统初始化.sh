@@ -12,11 +12,14 @@ exists_filePer(){
     fi
 }
 # 判断url地址是否有效   存在则下载
-exists_url(){
-    if [ "$(curl -s -f -I $1)" ];then
-        curl -O $1
+exists_url() {
+    wget --spider -q -o /dev/null --tries=1 -T 5 $1
+    if [ $? -eq 0 ]
+    then
+        wget $1
     else
-        exit 0
+        echo "$1 is fail."
+        exit 1
     fi
 }
 # 通过whereis查找二进制文件 存在则删除，反之打印不存在
@@ -202,6 +205,7 @@ func SetTitle()
         call setline(6,"#Description:                 The test script")                                                 
         call setline(7,"#Copyright (C):             ".strftime("%Y")." All rights reserved")
 		call setline(8, "##########################################################################")
+		call setline(9, "")
 	endif
 	if &filetype == 'yaml'
 		call setline(1, "##########################################################################") 
@@ -213,6 +217,7 @@ func SetTitle()
         call setline(7,"#Copyright (C):             ".strftime("%Y")." All rights reserved")
 		call setline(8, "###########################################################################")
 		call setline(9, "")
+		call setline(10, "")
 	endif
 	"新建文件后，自动定位到文件末尾
 	autocmd BufNewFile * normal G
@@ -364,7 +369,6 @@ filetype plugin indent on
 "打开文件类型检测, 加了这句才可以用智能补全
 set completeopt=longest,menu
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 EOF
 vim +PluginInstall +qall
 sudo yum -y install ctags

@@ -28,7 +28,7 @@ sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.29.2/doc
 # 7.添加x权限
 sudo chmod g+x /usr/local/bin/docker-compose
 # 开机启动docker和docker-compose
-if [ -z "$(ls /etc/systemd/system/multi-user.target.wants/|grep docker)" ];then
+if [ ! "$(ls /etc/systemd/system/multi-user.target.wants/|grep docker)" ];then
     echo "开机启动docker"
     systemctl enable docker
 fi

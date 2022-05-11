@@ -6,7 +6,7 @@ sed -e 's/#Port 22/Port 22/' \
     -e 's/#PasswordAuthentication yes/PasswordAuthentication yes/' \
     -i.bak ${config}`
 echo "开放ssh服务端口"
-if [ -z "$(firewall-cmd --list-service|grep ssh)" ];then
+if [ ! "$(firewall-cmd --list-service|grep ssh)" ];then
     echo "开放ftp服务端口"
     firewall-cmd --zone=public --permanent --add-service=ssh
     echo "重启防火墙"

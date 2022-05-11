@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # 判断url地址是否有效   存在则下载
-exists_url(){
-    if [ "$(curl -s -f -I $1)" ];then
-        curl -O $1
+exists_url() {
+    wget --spider -q -o /dev/null --tries=1 -T 5 $1
+    if [ $? -eq 0 ]
+    then
+        wget $1
     else
-        exit 0
+        echo "$1 is fail."
+        exit 1
     fi
 }
 
@@ -71,7 +74,7 @@ fi
 sudo systemctl daemon-reload
 sudo systemctl start nginx
 # 11.开放服务
-if [ -e "$(sudo firewall-cmd --list-ports|grep 80)" ];then
+if [ ! "$(sudo firewall-cmd --list-ports|grep 80)" ];then
     echo "开放80端口"
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
     sudo firewall-cmd --reload

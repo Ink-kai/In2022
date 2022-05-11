@@ -84,7 +84,7 @@ if [ -z "$(systemctl list-units|grep vsftpd)" ];then
     echo "开机启动vsftpd"
     systemctl enable vsftpd
 fi
-if [ -z "$(sudo firewall-cmd --list-service|grep ftp)" ];then
+if [ ! "$(sudo firewall-cmd --list-service|grep ftp)" ];then
     echo "开放ftp服务端口"
     firewall-cmd --zone=public --permanent --add-service=ftp
     echo "重启防火墙"
