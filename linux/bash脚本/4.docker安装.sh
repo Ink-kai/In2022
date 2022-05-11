@@ -24,15 +24,21 @@ sudo yum - install docker-ce-${VERSION_STRING} docker-ce-cli-${VERSION_STRING} c
 # 5.卸载docker-compose
 sudo rm -rf /usr/local/lib/docker/cli-plugins/docker-compose||rm -rf /usr/local/lib/docker-compose
 # 6.安装docker-compose
-sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.25.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/lib/docker-compose
+sudo curl -L https://get.daocloud.io/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 # 7.添加x权限
-sudo chmod +x /usr/local/lib/docker-compose
-sudo ln -sf /usr/local/lib/docker-compose /usr/local/bin/
+sudo chmod g+x /usr/local/bin/docker-compose
 # 开机启动docker和docker-compose
-if [ -z "$(systemctl list-units|grep docker)" ];then
+if [ -z "$(ls /etc/systemd/system/multi-user.target.wants/|grep docker)" ];then
     echo "开机启动docker"
     systemctl enable docker
 fi
+echo "添加docker组"
+sudo groupadd docker
+echo "添加当前用户到docker组"
+sudo usermod -a -G docker $USER
+echo "更新docker组"
+newgrp docker
+echo "/etc/docker目录添加w组权限"
 sudo chmod g+w /etc/docker
 sudo cat>/etc/docker/daemon.json <<EOF
 {
@@ -44,10 +50,12 @@ sudo cat>/etc/docker/daemon.json <<EOF
       "http://f1361db2.m.daocloud.io",
       "https://mirror.ccs.tencentyun.com",
       "https://docker.mirrors.ustc.edu.cn",
-      "https://registry.docker-cn.com",
+      "https://registry.docker-cn.com"
       ]
 }
 EOF
 echo "启动docker和docker-compse"
 sudo systemctl daemon-reload
-systemctl start docker
+sudo systemctl start docker
+echo "配置Bridge网卡"
+docker network create --subnet=172.21.235.0/24  ink_data

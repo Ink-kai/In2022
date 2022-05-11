@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# 判断url地址是否有效   存在则下载
+exists_url(){
+    if [ "$(curl -s -f -I $1)" ];then
+        curl -O $1
+    else
+        exit 0
+    fi
+}
+
 # 1.删除旧版本nginx
 sudo yum erase nginx*
 sudo find / -name "nginx"|xargs -i sudo rm -rf {}
@@ -14,7 +23,7 @@ exists_nginxDir=$(sudo find / -name "nginx-1.9.9.tar.gz"|head -n 1)
 if [ "$exists_nginxDir" ];then
     cd $(dirname $exists_nginxDir)
 else
-    curl -O http://nginx.org/download/nginx-1.9.9.tar.gz
+    exists_url "http://nginx.org/download/nginx-1.9.9.tar.gz"
 fi
 # 4.解压 进入目录
 tar -zxf nginx-1.9.9.tar.gz && cd nginx-1.9.9
@@ -45,7 +54,7 @@ PrivateTmp=True
 WantedBy=multi-user.target
 EOF
 # 9.开机启动nginx
-if [ -z "$(systemctl list-units|grep nginx)" ];then
+if [ -z "$(ls /etc/systemd/system/multi-user.target.wants/|grep nginx)" ];then
     echo "开机启动nginx"
     systemctl enable nginx
 fi
