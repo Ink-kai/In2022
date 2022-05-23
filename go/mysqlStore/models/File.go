@@ -4,7 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type FileInfo struct {
+type fileInfo struct {
 	Name       string `gorm:"not null"`
 	Content    []byte `gorm:"type:LONGBLOB;not null"`
 	Size       int64  `gorm:"not null"`
@@ -17,17 +17,17 @@ type FileInfo struct {
 	gorm.Model
 }
 
-func FileNew() *FileInfo {
-	return new(FileInfo)
+func FileNew() *fileInfo {
+	return &fileInfo{}
 }
-func (f *FileInfo) Insert() error {
+func (f *fileInfo) Insert() error {
 	if err := db.Create(&f).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (f *FileInfo) Delete() error {
+func (f *fileInfo) Delete() error {
 	if err := db.Delete(&f).Error; err != nil {
 		return err
 	}
