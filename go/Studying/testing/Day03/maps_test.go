@@ -101,3 +101,57 @@ func Test_directiroy_Update(t *testing.T) {
 		})
 	}
 }
+
+func Benchmark_directiroy_Search(b *testing.B) {
+	type args struct {
+		key string
+	}
+	tests := []struct {
+		name string
+		d    directiroy
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{"directiroy_Search", directiroy{"eng": "英语"}, args{"eng"}, "英语"},
+		{"directiroy_Search", directiroy{"num": "123409000000"}, args{"num"}, "123409000000"},
+		{"directiroy_Search", directiroy{"特殊字符": "~!@#$%^&*()_+{}|:’<>?+-‘"}, args{"特殊字符"}, "~!@#$%^&*()_+{}|:’<>?+-‘"},
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for _, tt := range tests {
+			b.Run(tt.name, func(b *testing.B) {
+				if got := tt.d.Search(tt.args.key); got != tt.want {
+					b.Errorf("directiroy.Search() = %v, want %v", got, tt.want)
+				}
+			})
+		}
+	}
+}
+func Benchmark_directiroy_Add(b *testing.B) {
+	type args struct {
+		key   string
+		value string
+	}
+	tests := []struct {
+		name string
+		d    directiroy
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+		{"directiroy_Add", directiroy{"eng": "英语"}, args{key: "Chinese", value: "语文"}, "Chinese"},
+		{"directiroy_Add", directiroy{}, args{key: "数字", value: "12432432"}, "数字"},
+		{"directiroy_Add", directiroy{}, args{key: "特殊字符", value: "《》？：“{}"}, "特殊字符"},
+	}
+	for i := 0; i < b.N; i++ {
+		for _, tt := range tests {
+			b.Run(tt.name, func(B *testing.B) {
+				tt.d.Add(tt.args.key, tt.args.value)
+				if got := tt.d.Search(tt.want); got == "" {
+					b.Errorf("directiroy.Add() = %v, want %v", got, tt.want)
+				}
+			})
+		}
+	}
+}
