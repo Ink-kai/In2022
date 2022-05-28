@@ -1,17 +1,27 @@
 package model
 
 type Article struct {
-	ID        uint `gorm:"primaryKey;autoIncrement:true"`
-	Aid       uint `gorm:"primaryKey;autoIncrement:false"`
-	UserID    uint
-	Categorys []Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Tags      []Tag      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Title     string     `gorm:"not null"	form:"not null"`
-	Content   string     `gorm:"not null"	form:"not null"`
+	ID        uint64               `gorm:"primaryKey;autoIncrement:true"`
+	ArticleID uint64               `gorm:"primaryKey;autoIncrement:false"`
+	Articles  []UserRefArticle     `gorm:"foreignKey:ArticleID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Categorys []ArticleRefCategory `gorm:"foreignKey:CategoryID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Tags      []ArticleRefTag      `gorm:"foreignKey:TagID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Title     string               `gorm:"not null"	form:"not null"`
+	Content   string               `gorm:"not null"	form:"not null"`
+	CreatedAt uint64
+	UpdatedAt uint64
+	DeletedAt uint64 `sql:"index"`
+}
+type ArticleRefCategory struct {
+	ID         uint64 `gorm:"primary_key;autoIncrement:true"`
+	ArticleID  uint64
+	CategoryID uint64
+}
 
-	CreatedAt uint
-	UpdatedAt uint
-	DeletedAt uint `sql:"index"`
+type ArticleRefTag struct {
+	ID        uint64 `gorm:"primary_key;autoIncrement:true"`
+	ArticleID uint64
+	TagID     uint64
 }
 
 func (article *Article) GetArticle(title string) error {

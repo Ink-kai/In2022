@@ -17,7 +17,7 @@ var (
 func New() {
 	var err error
 	// 读取数据库配置
-	conf, err := GetMysqlConf("test")
+	conf, err := GetMysqlConf("test", "")
 	if err != nil {
 		Logger.Errorf("读取mysql配置错误：\t", err)
 	}
@@ -41,5 +41,5 @@ func New() {
 	if err != nil {
 		Logger.Errorf("connect to %v error：%v", conf.Host, err)
 	}
-	DB.AutoMigrate(&User{}, &Article{}, &Tag{}, &Category{})
+	DB.AutoMigrate(&Article{}, &Tag{}, &Category{}, &User{}, &UserRefArticle{}, &ArticleRefCategory{}, &ArticleRefTag{})
 }

@@ -18,11 +18,21 @@ type ServerConf struct {
 	Port int
 }
 
-func GetServerConf(mode string) (*ServerConf, error) {
-	var sec *ini.Section
-	cfg, err := ini.LoadSources(ini.LoadOptions{
-		SkipUnrecognizableLines: true,
-	}, "conf/server.ini")
+func GetServerConf(mode, path string) (*ServerConf, error) {
+	var (
+		cfg *ini.File
+		err error
+		sec *ini.Section
+	)
+	if path == "" {
+		cfg, err = ini.LoadSources(ini.LoadOptions{
+			SkipUnrecognizableLines: true,
+		}, "conf/server.ini")
+	} else {
+		cfg, err = ini.LoadSources(ini.LoadOptions{
+			SkipUnrecognizableLines: true,
+		}, path)
+	}
 	if err != nil {
 		// Logger.Errorf("open ini file error：%v", err)
 		return nil, err
@@ -44,11 +54,22 @@ func GetServerConf(mode string) (*ServerConf, error) {
 	return conf, nil
 }
 
-func GetMysqlConf(mode string) (*MysqlConf, error) {
-	var sec *ini.Section
-	cfg, err := ini.LoadSources(ini.LoadOptions{
-		SkipUnrecognizableLines: true,
-	}, "conf/mysql.ini")
+func GetMysqlConf(mode, path string) (*MysqlConf, error) {
+
+	var (
+		cfg *ini.File
+		err error
+		sec *ini.Section
+	)
+	if path == "" {
+		cfg, err = ini.LoadSources(ini.LoadOptions{
+			SkipUnrecognizableLines: true,
+		}, "conf/mysql.ini")
+	} else {
+		cfg, err = ini.LoadSources(ini.LoadOptions{
+			SkipUnrecognizableLines: true,
+		}, path)
+	}
 	if err != nil {
 		// Logger.Errorf("open ini file error：%v", err)
 		return nil, err
