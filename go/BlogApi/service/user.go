@@ -1,8 +1,10 @@
 package service
 
 import (
-	// . "BlogApi/model"
+	. "BlogApi/model"
 	. "BlogApi/utils"
+	"encoding/json"
+	"io"
 	"net/http"
 	"time"
 
@@ -11,9 +13,9 @@ import (
 )
 
 type UserForm struct {
-	Name     string `form:"name"	json:"name"`
-	Password string `form:"password"	json:"password"`
-	Email    string `form:"email"	json:"email"	validate:"email"`
+	Name     string `form:"name"	json:"name"	validate:"required"`
+	Password string `form:"password"	json:"password"	validate:"required"`
+	Email    string `form:"email" json:"email" validate:"omitempty,email"`
 	Phone    string `form:"phone"	json:"phone"`
 	Birthday string `form:"birthday"	json:"birthday"`
 	Address  string `form:"address"	json:"address"`
@@ -29,7 +31,18 @@ func AddUser(ctx *gin.Context) {
 		Birthday int64 = time.Now().Unix()
 	)
 	if err := ctx.Bind(&data); err != nil {
-		Logger.Errorf("绑定FormUser结构体错误。\t%+v", err.Error())
+		Log.Errorf("绑定FormUser结构体错误。\t%+v", err.Error())
+	}
+	body, _ := io.ReadAll(ctx.Request.Body)
+	if len(body) != 0 {
+		json.Unmarshal(body, &(data))
+	} else if data.Name == "" && data.Password == "" {
+		msg = gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "参数不完整。请查看参数校验",
+		}
+		ctx.PureJSON(http.StatusOK, msg)
+		return
 	}
 	UserUID := GenerateID()
 	data.Password = string(EncryptPassword(data.Password))
@@ -41,36 +54,37 @@ func AddUser(ctx *gin.Context) {
 		var validate_err string
 		for _, err := range err.(validator.ValidationErrors) {
 			validate_err = err.Error()
-			Logger.Errorf("%+v", err)
+			Log.Errorf("%v	", err)
 		}
 		msg = gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": validate_err,
 		}
-		ctx.PureJSON(http.StatusInternalServerError, msg)
+		ctx.PureJSON(http.StatusOK, msg)
 		return
 	}
-
-	// u := &User{
-	// 	UserUID:  UserUID,
-	// 	Name:     data.Name,
-	// 	Password: data.Password,
-	// 	Email:    data.Email,
-	// 	Phone:    data.Phone,
-	// 	Birthday: Birthday,
-	// 	Address:  data.Address,
-	// 	Remark:   data.Remark,
-	// 	Desc:     data.Desc,
-	// }
-	// if err := u.AddUser(); err != nil {
-	// 	Logger.Errorf("创建用户错误：\t%+v", err)
-	// }
+	cookie, _ := ctx.Cookie("mode")
+	if cookie != "debug" {
+		u := &User{
+			UserUID:  UserUID,
+			Name:     data.Name,
+			Password: data.Password,
+			Email:    data.Email,
+			Phone:    data.Phone,
+			Birthday: Birthday,
+			Address:  data.Address,
+			Remark:   data.Remark,
+			Desc:     data.Desc,
+		}
+		if err := u.AddUser(); err != nil {
+			Log.Errorf("创建用户错误：\t%+v", err)
+		}
+	}
 	msg = gin.H{
 		"code": http.StatusOK,
 		"message": gin.H{
-			"UserUID":  UserUID,
-			"name":     data.Name,
-			"birthday": Birthday,
+			"name":  data.Name,
+			"email": data.Email,
 		},
 	}
 	ctx.PureJSON(http.StatusOK, msg)

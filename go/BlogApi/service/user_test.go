@@ -1,13 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/liuhongdi/gintest01/pkg/unittest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,19 +27,24 @@ func TestAddUser(t *testing.T) {
 		name string
 		data map[string]string
 	}{
-		{"测试1", map[string]string{"name": "刘凯", "password": "lje4wo5i86y7u845uy"}},
-		{"测试2", map[string]string{"name": "ink", "password": "", "email": "1@q.com"}},
+		{"测试1", map[string]string{"name": "刘凯", "password": "lje4wo5i86y7u845uy", "email": "123@21.chjk"}},
+		{"测试2", map[string]string{"name": "ink", "password": "4444444", "email": "b.zweeucm@hirwixktku.aw"}},
+		{"测试3", map[string]string{"name": "faew/", "password": "423423", "email": "123@qq.com"}},
 	}
 	r := Setup()
 	for _, tt := range test {
 		t.Run(tt.name, func(t *testing.T) {
-			var w *httptest.ResponseRecorder
-			w = unittest.PostForm("/api/test/AddUser", tt.data, r)
+			jsonByte, _ := json.Marshal(tt.data)
+			req := httptest.NewRequest("POST", "/api/test/AddUser", bytes.NewReader(jsonByte))
+			req.Header.Add("Cookie", "mode=test")
+			req.Header.Add("Content-Type", "application/form-data; charset=utf-8")
+			w := httptest.NewRecorder()
+			r.ServeHTTP(w, req)
 			assert.Equal(t, http.StatusOK, w.Code)
-			body, _ := ioutil.ReadAll(w.Body)
 			var data map[string]map[string]interface{}
-			json.Unmarshal(body, &data)
+			json.Unmarshal([]byte(w.Body.String()), &data)
 			assert.Equal(t, tt.data["name"], data["message"]["name"])
+			assert.Equal(t, tt.data["email"], data["message"]["email"])
 		})
 	}
 }

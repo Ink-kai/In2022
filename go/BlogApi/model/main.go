@@ -19,7 +19,7 @@ func New() {
 	// 读取数据库配置
 	conf, err := GetMysqlConf("test", "")
 	if err != nil {
-		Logger.Errorf("读取mysql配置错误：\t", err)
+		Log.Errorf("读取mysql配置错误：\t", err)
 	}
 	// 连接数据库
 	DB, err = gorm.Open(mysql.New(mysql.Config{
@@ -39,7 +39,7 @@ func New() {
 		},
 	})
 	if err != nil {
-		Logger.Errorf("connect to %v error：%v", conf.Host, err)
+		Log.Errorf("connect to %v error：%v", conf.Host, err)
 	}
 	DB.AutoMigrate(&Article{}, &Tag{}, &Category{}, &User{}, &UserRefArticle{}, &ArticleRefCategory{}, &ArticleRefTag{})
 }
